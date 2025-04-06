@@ -8,9 +8,9 @@
 *.out
 
 # output folders
-# bin/*
-# !bin/
-# !bin/**/
+bin/*
+!bin/
+!bin/**/
 
 **/build/
 
