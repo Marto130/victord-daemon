@@ -1,17 +1,10 @@
 syntax = "proto3";
 
-package victord;
-option go_package = "victord/daemon/grpc";
+package pb;
+option go_package = "git@github.com/victor-base/victord/daemon/grpc/pb";
 
-
-
-
-service VictorService {
-  rpc CreateIndex (CreateIndexRequest) returns (CreateIndexResponse);
-}
 
 message CreateIndexRequest {
-
   uint32 index_type = 1;
   uint32 method = 2;
   uint32 dims = 3;
@@ -26,9 +19,14 @@ message CreateIndexResponse {
 }
 
 message CreateIndexResult {
- string index_name = 1;
- string id = 2;
- uint32 dims = 3;
- string index_type = 4;
- string method = 5;
+  string index_name = 1;
+  string id = 2;
+  uint32 dims = 3;
+  string index_type = 4;
+  string method = 5;
+}
+
+
+service VictorService {
+  rpc CreateIndex (CreateIndexRequest) returns (CreateIndexResponse);
 }

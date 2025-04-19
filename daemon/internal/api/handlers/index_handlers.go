@@ -4,12 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"sync"
+	"victord/daemon/internal/services"
 	"victord/daemon/pkg/models"
-	"victord/daemon/pkg/store"
 
-	binding "victord/binding"
-
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -19,7 +16,6 @@ var (
 
 func CreateIndexHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		var createIndexRequest models.CreateIndexRequest
 
 		urlParams := mux.Vars(r)
@@ -37,42 +33,26 @@ func CreateIndexHandler() http.HandlerFunc {
 			return
 		}
 
-		index, err := binding.AllocIndex(createIndexRequest.IndexType, createIndexRequest.Method, createIndexRequest.Dims)
+		indexResource, err := services.CreateIndex(&createIndexRequest, indexNameParam)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
 
-		indexID := uuid.New().String()
-
-		indexResource := models.IndexResource{
-			CreateIndexRequest: models.CreateIndexRequest{
-				IndexType: createIndexRequest.IndexType,
-				Method:    createIndexRequest.Method,
-				Dims:      createIndexRequest.Dims,
-			},
-			VIndex:    index,
-			IndexName: indexNameParam,
-			IndexID:   indexID,
-		}
-
-		store.StoreIndex(&indexResource)
-
-		response := models.CreateIndexResponse{
-			Status:  "success",
-			Message: "Index created successfully",
-			Results: models.CreateIndexResult{
-				IndexName: indexNameParam,
-				ID:        indexID,
-				Dims:      createIndexRequest.Dims,
-				IndexType: createIndexRequest.IndexType,
-				Method:    createIndexRequest.Method,
-			},
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 
+		res := models.CreateIndexResponse{
+			Status:  "success",
+			Message: "Index created successfully",
+			Results: models.CreateIndexResult{
+				IndexName: indexResource.IndexName,
+				ID:        indexResource.IndexID,
+				Dims:      indexResource.Dims,
+				IndexType: indexResource.IndexType,
+				Method:    indexResource.Method,
+			},
+		}
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(response)
+		json.NewEncoder(w).Encode(res)
 	}
 }

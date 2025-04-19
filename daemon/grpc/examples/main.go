@@ -4,23 +4,26 @@ import (
 	"context"
 	"log"
 	"time"
-
-	pb "victord/daemon/grpc/gen/victord/daemon/grpc"
+	"victord/daemon/grpc/pb"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
-	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure(), grpc.WithBlock())
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	conn, err := grpc.NewClient(
+		"localhost:50051",
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
 	if err != nil {
-		log.Fatalf("No se pudo conectar: %v", err)
+		log.Fatalf("could not connect: %v", err)
 	}
 	defer conn.Close()
 
 	client := pb.NewVictorServiceClient(conn)
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	defer cancel()
 
 	req := &pb.CreateIndexRequest{
 		IndexType: 1,

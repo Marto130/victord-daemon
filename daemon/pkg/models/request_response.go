@@ -18,7 +18,7 @@ type DeleteVectorResult struct {
 }
 
 type SearchVectorResult struct {
-	ID       uint64  `json:"id"`
+	ID       int     `json:"id"`
 	Distance float32 `json:"distance"`
 }
 
