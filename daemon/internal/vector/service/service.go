@@ -9,7 +9,14 @@ import (
 	storeService "victord/daemon/internal/store/service"
 )
 
-func InsertVector(vectorData *dto.InsertVectorRequest, idxName string) (*uint64, error) {
+type vectorService struct {
+}
+
+func NewVectorService() VectorService {
+	return &vectorService{}
+}
+
+func (v *vectorService) InsertVector(vectorData *dto.InsertVectorRequest, idxName string) (*uint64, error) {
 
 	indexResource, exists := storeService.GetIndex(idxName)
 	if !exists {
@@ -38,7 +45,7 @@ func InsertVector(vectorData *dto.InsertVectorRequest, idxName string) (*uint64,
 
 }
 
-func DeleteVector(vectorId uint64, idxName string) (*uint64, error) {
+func (v *vectorService) DeleteVector(vectorId uint64, idxName string) (*uint64, error) {
 	indexResource, exists := storeService.GetIndex(idxName)
 	if !exists {
 		return nil, errors.New("Index not found")
@@ -54,7 +61,7 @@ func DeleteVector(vectorId uint64, idxName string) (*uint64, error) {
 	return &vectorId, nil
 }
 
-func SearchVector(vector []*float32, idxName string, topK int) (*vectorEntity.SearchVectorResult, error) {
+func (v *vectorService) SearchVector(vector []*float32, idxName string, topK int) (*vectorEntity.SearchVectorResult, error) {
 	fmt.Println("Index name:", idxName)
 
 	indexResource, exists := service.GetIndex(idxName)

@@ -8,12 +8,11 @@ import (
 	"strings"
 	"victord/daemon/internal/dto"
 	entity "victord/daemon/internal/entity/vector"
-	"victord/daemon/internal/vector/service"
 
 	"github.com/gorilla/mux"
 )
 
-func InsertVectorHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) InsertVectorHandler(w http.ResponseWriter, r *http.Request) {
 	var req *dto.InsertVectorRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		fmt.Println("Error decoding request:", err)
@@ -24,7 +23,7 @@ func InsertVectorHandler(w http.ResponseWriter, r *http.Request) {
 	urlParams := mux.Vars(r)
 	indexNameParam := urlParams["indexName"]
 
-	vecId, err := service.InsertVector(req, indexNameParam)
+	vecId, err := h.VectorService.InsertVector(req, indexNameParam)
 	if err != nil {
 		fmt.Println("Error inserting vector:", err)
 		http.Error(w, "Failed to insert vector", http.StatusInternalServerError)
@@ -45,7 +44,7 @@ func InsertVectorHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func DeleteVectorHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) DeleteVectorHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	indexName := vars["indexName"]
 	vectorID := vars["vectorID"]
@@ -56,7 +55,7 @@ func DeleteVectorHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	service.DeleteVector(vectId, indexName)
+	h.VectorService.DeleteVector(vectId, indexName)
 
 	res := dto.DeleteVectorResponse{
 		Status:  "200",
@@ -70,7 +69,7 @@ func DeleteVectorHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
-func SearchVectorHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) SearchVectorHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("--SEARCH HANDLER--")
 	vars := mux.Vars(r)
 	indexName := vars["indexName"]
@@ -115,7 +114,7 @@ func SearchVectorHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("topK:", k)
 
-	result, err := service.SearchVector(vec, indexName, k)
+	result, err := h.VectorService.SearchVector(vec, indexName, k)
 	if err != nil {
 		fmt.Println("Error searching vector:", err)
 		http.Error(w, "Failed to search vector", http.StatusInternalServerError)

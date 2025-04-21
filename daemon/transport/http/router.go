@@ -2,7 +2,8 @@ package api
 
 import (
 	"net/http"
-	"victord/daemon/internal/index/service"
+	iService "victord/daemon/internal/index/service"
+	vService "victord/daemon/internal/vector/service"
 	"victord/daemon/transport/http/handlers"
 	"victord/daemon/transport/http/routes"
 
@@ -11,16 +12,16 @@ import (
 
 func RegisterRoutes(r *mux.Router, h *handlers.Handler) {
 	r.HandleFunc(routes.CreateIndexPath, h.CreateIndexHandler).Methods(http.MethodPost)
-	r.HandleFunc(routes.InsertVectorPath, handlers.InsertVectorHandler).Methods(http.MethodPost)
-	r.HandleFunc(routes.DeleteVectorPath, handlers.DeleteVectorHandler).Methods(http.MethodDelete)
-	r.HandleFunc(routes.SearchVectorPath, handlers.SearchVectorHandler).Methods(http.MethodGet)
+	r.HandleFunc(routes.InsertVectorPath, h.InsertVectorHandler).Methods(http.MethodPost)
+	r.HandleFunc(routes.DeleteVectorPath, h.DeleteVectorHandler).Methods(http.MethodDelete)
+	r.HandleFunc(routes.SearchVectorPath, h.SearchVectorHandler).Methods(http.MethodGet)
 }
 
 func SetupRouter() *mux.Router {
 	router := mux.NewRouter()
-	indexService := service.NewIndexService()
 	handler := &handlers.Handler{
-		IndexService: indexService,
+		IndexService:  iService.NewIndexService(),
+		VectorService: vService.NewVectorService(),
 	}
 	RegisterRoutes(router, handler)
 	return router

@@ -6,14 +6,9 @@ import (
 
 	"victord/daemon/internal/dto"
 	indexEntity "victord/daemon/internal/entity/index"
-	"victord/daemon/internal/index/service"
 
 	"github.com/gorilla/mux"
 )
-
-type Handler struct {
-	IndexService service.IndexService
-}
 
 func (h *Handler) CreateIndexHandler(w http.ResponseWriter, r *http.Request) {
 
