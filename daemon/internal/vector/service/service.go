@@ -3,10 +3,10 @@ package service
 import (
 	"errors"
 	"fmt"
+	"victord/daemon/internal/dto"
 	vectorEntity "victord/daemon/internal/entity/vector"
 	"victord/daemon/internal/store/service"
 	storeService "victord/daemon/internal/store/service"
-	"victord/daemon/internal/transport/dto"
 )
 
 func InsertVector(vectorData *dto.InsertVectorRequest, idxName string) (*uint64, error) {

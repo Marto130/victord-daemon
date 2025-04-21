@@ -1,15 +1,23 @@
 package service
 
 import (
-	binding "victord/binding"
+	"context"
+	"victord/daemon/internal/dto"
 	"victord/daemon/internal/index/models"
 	"victord/daemon/internal/store/service"
-	"victord/daemon/internal/transport/dto"
+	binding "victord/daemon/platform/binding"
 
 	"github.com/google/uuid"
 )
 
-func CreateIndex(idx *dto.CreateIndexRequest, name string) (*models.IndexResource, error) {
+type indexService struct {
+}
+
+func NewIndexService() IndexService {
+	return &indexService{}
+}
+
+func (i *indexService) CreateIndex(ctx context.Context, idx *dto.CreateIndexRequest, name string) (*models.IndexResource, error) {
 
 	index, err := binding.AllocIndex(idx.IndexType, idx.Method, idx.Dims)
 	if err != nil {

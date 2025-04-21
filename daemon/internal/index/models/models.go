@@ -1,6 +1,6 @@
 package models
 
-import binding "victord/binding"
+import binding "victord/daemon/platform/binding"
 
 type IndexResource struct {
 	IndexID   string `json:"index_id"`

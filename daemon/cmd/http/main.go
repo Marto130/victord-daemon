@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"victord/daemon/internal/config"
-	api "victord/daemon/internal/http"
+	api "victord/daemon/transport/http"
 )
 
 func main() {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"victord/daemon/internal/grpc/server"
+	"victord/daemon/transport/grpc/server"
 )
 
 func main() {
