@@ -5,7 +5,7 @@ import (
 	"victord/daemon/internal/dto"
 	"victord/daemon/internal/index/models"
 	"victord/daemon/internal/store/service"
-	binding "victord/daemon/platform/binding"
+	"victord/daemon/platform/victor"
 
 	"github.com/google/uuid"
 )
@@ -19,7 +19,7 @@ func NewIndexService() IndexService {
 
 func (i *indexService) CreateIndex(ctx context.Context, idx *dto.CreateIndexRequest, name string) (*models.IndexResource, error) {
 
-	index, err := binding.AllocIndex(idx.IndexType, idx.Method, idx.Dims)
+	index, err := victor.AllocIndex(idx.IndexType, idx.Method, idx.Dims)
 	if err != nil {
 		return nil, err
 	}
