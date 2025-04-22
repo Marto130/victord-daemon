@@ -1,6 +1,6 @@
 package models
 
-import binding "victord/daemon/platform/binding"
+import "victord/daemon/platform/victor"
 
 type IndexResource struct {
 	IndexID   string `json:"index_id"`
@@ -8,5 +8,5 @@ type IndexResource struct {
 	Method    int    `json:"method"`
 	Dims      uint16 `json:"dims"`
 	IndexName string `json:"index_name"`
-	VIndex    *binding.Index
+	VIndex    *victor.Index
 }
