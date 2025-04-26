@@ -62,7 +62,7 @@ func (v *vectorService) DeleteVector(vectorId uint64, idxName string) (*uint64, 
 }
 
 func (v *vectorService) SearchVector(vector []*float32, idxName string, topK int) (*vectorEntity.SearchVectorResult, error) {
-	fmt.Println("Index name:", idxName)
+	fmt.Println("Index name: ", idxName)
 
 	indexResource, exists := service.GetIndex(idxName)
 	if !exists {
@@ -79,8 +79,8 @@ func (v *vectorService) SearchVector(vector []*float32, idxName string, topK int
 		flatVector[i] = *f
 	}
 
-	fmt.Println("Vector to search:", vector)
-	fmt.Println("topK:", topK)
+	fmt.Println("Vector to search: ", vector)
+	fmt.Println("topK: ", topK)
 
 	result, err := vIndex.Search(flatVector, topK)
 	if err != nil {

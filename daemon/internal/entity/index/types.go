@@ -7,3 +7,11 @@ type CreateIndexResult struct {
 	IndexType int    `json:"index_type"`
 	Method    int    `json:"method"`
 }
+
+type DestroyIndexResult struct {
+	IndexName string `json:"index_name"`
+	ID        string `json:"id"`
+	Dims      uint16 `json:"dims"`
+	IndexType int    `json:"index_type"`
+	Method    int    `json:"method"`
+}

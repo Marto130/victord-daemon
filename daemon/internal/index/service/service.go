@@ -39,3 +39,26 @@ func (i *indexService) CreateIndex(ctx context.Context, idx *dto.CreateIndexRequ
 
 	return &indexResource, err
 }
+
+func (i *indexService) DestroyIndex(ctx context.Context, idx *dto.DestroyIndexRequest, name string) (*models.IndexResource, error) {
+
+	index, err := victor.AllocIndex(idx.IndexType, idx.Method, idx.Dims)
+	if err != nil {
+		return nil, err
+	}
+
+	indexID := uuid.New().String()
+
+	indexResource := models.IndexResource{
+		IndexType: idx.IndexType,
+		Method:    idx.Method,
+		Dims:      idx.Dims,
+		VIndex:    index,
+		IndexName: name,
+		IndexID:   indexID,
+	}
+
+	service.StoreIndex(&indexResource)
+
+	return &indexResource, err
+}
