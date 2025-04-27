@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-
 	"victord/daemon/internal/dto"
 	indexEntity "victord/daemon/internal/entity/index"
 
@@ -35,7 +34,7 @@ func (h *Handler) CreateIndexHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	res := dto.CreateIndexResponse{
-		Status:  "success",
+		Status:  "Success",
 		Message: "Index created successfully",
 		Results: indexEntity.CreateIndexResult{
 			IndexName: indexResource.IndexName,
@@ -43,6 +42,35 @@ func (h *Handler) CreateIndexHandler(w http.ResponseWriter, r *http.Request) {
 			Dims:      indexResource.Dims,
 			IndexType: indexResource.IndexType,
 			Method:    indexResource.Method,
+		},
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(res)
+}
+
+func (h *Handler) DestroyIndexHandler(w http.ResponseWriter, r *http.Request) {
+
+	urlParams := mux.Vars(r)
+	indexNameParam := urlParams["indexName"]
+	if indexNameParam == "" {
+		http.Error(w, "Index name is required", http.StatusBadRequest)
+		return
+	}
+
+	destroyResult, err := h.IndexService.DestroyIndex(r.Context(), indexNameParam)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	res := dto.DestroyIndexResponse{
+		Status:  "Success",
+		Message: "Index destroyed successfully",
+		Results: indexEntity.DestroyIndexResult{
+			ID:        destroyResult.ID,
+			IndexName: destroyResult.IndexName,
 		},
 	}
 	w.WriteHeader(http.StatusOK)

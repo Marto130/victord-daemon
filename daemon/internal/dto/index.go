@@ -15,3 +15,9 @@ type CreateIndexResponse struct {
 	Message string                   `json:"message,omitempty"`
 	Results entity.CreateIndexResult `json:"results"`
 }
+
+type DestroyIndexResponse struct {
+	Status  string                    `json:"status"`
+	Message string                    `json:"message,omitempty"`
+	Results entity.DestroyIndexResult `json:"results"`
+}
