@@ -2,9 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
-	"net/http"	
+	"net/http"
 	"victord/daemon/internal/dto"
 	indexEntity "victord/daemon/internal/entity/index"
+
 	"github.com/gorilla/mux"
 )
 
@@ -48,21 +49,15 @@ func (h *Handler) CreateIndexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) DestroyIndexHandler(w http.ResponseWriter, r *http.Request) {
-	
-	urlParams := mux.Vars(r);
-	var destroyIndexRequest dto.DestroyIndexRequest
+
+	urlParams := mux.Vars(r)
 	indexNameParam := urlParams["indexName"]
 	if indexNameParam == "" {
 		http.Error(w, "Index name is required", http.StatusBadRequest)
 		return
 	}
 
-	if err := json.NewDecoder(r.Body).Decode(&destroyIndexRequest); err != nil {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
-		return
-	}
-
-	indexResource, err := h.IndexService.DestroyIndex(r.Context(), &destroyIndexRequest, indexNameParam)
+	destroyResult, err := h.IndexService.DestroyIndex(r.Context(), indexNameParam)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 
@@ -74,11 +69,8 @@ func (h *Handler) DestroyIndexHandler(w http.ResponseWriter, r *http.Request) {
 		Status:  "Success",
 		Message: "Index destroyed successfully",
 		Results: indexEntity.DestroyIndexResult{
-			IndexName: indexResource.IndexName,
-			ID:        indexResource.IndexID,
-			Dims:      indexResource.Dims,
-			IndexType: indexResource.IndexType,
-			Method:    indexResource.Method,
+			ID:        destroyResult.ID,
+			IndexName: destroyResult.IndexName,
 		},
 	}
 	w.WriteHeader(http.StatusOK)

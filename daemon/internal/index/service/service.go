@@ -2,9 +2,12 @@ package service
 
 import (
 	"context"
+	"errors"
 	"victord/daemon/internal/dto"
+	"victord/daemon/internal/entity/index"
 	"victord/daemon/internal/index/models"
 	"victord/daemon/internal/store/service"
+	storeService "victord/daemon/internal/store/service"
 	"victord/daemon/platform/victor"
 
 	"github.com/google/uuid"
@@ -40,25 +43,20 @@ func (i *indexService) CreateIndex(ctx context.Context, idx *dto.CreateIndexRequ
 	return &indexResource, err
 }
 
-func (i *indexService) DestroyIndex(ctx context.Context, idx *dto.DestroyIndexRequest, name string) (*models.IndexResource, error) {
+func (i *indexService) DestroyIndex(ctx context.Context, name string) (*index.DestroyIndexResult, error) {
 
-	index, err := victor.AllocIndex(idx.IndexType, idx.Method, idx.Dims)
-	if err != nil {
-		return nil, err
+	indexResource, exists := storeService.GetIndex(name)
+	if !exists {
+		return nil, errors.New("Index not found")
 	}
 
-	indexID := uuid.New().String()
+	//TODO: Here we need to retrieve a message from the binding if the index doesn't exists.
+	indexResource.VIndex.DestroyIndex()
 
-	indexResource := models.IndexResource{
-		IndexType: idx.IndexType,
-		Method:    idx.Method,
-		Dims:      idx.Dims,
-		VIndex:    index,
-		IndexName: name,
-		IndexID:   indexID,
+	destroyResult := index.DestroyIndexResult{
+		ID:        indexResource.IndexID,
+		IndexName: indexResource.IndexName,
 	}
 
-	service.StoreIndex(&indexResource)
-
-	return &indexResource, err
+	return &destroyResult, nil
 }
