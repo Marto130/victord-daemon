@@ -13,7 +13,7 @@ import (
 )
 
 func (h *Handler) InsertVectorHandler(w http.ResponseWriter, r *http.Request) {
-	var req *dto.InsertVectorRequest
+	var req dto.InsertVectorRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		fmt.Println("Error decoding request:", err)
 		http.Error(w, "Invalid insert vector request payload", http.StatusBadRequest)
@@ -23,7 +23,7 @@ func (h *Handler) InsertVectorHandler(w http.ResponseWriter, r *http.Request) {
 	urlParams := mux.Vars(r)
 	indexNameParam := urlParams["indexName"]
 
-	vecId, err := h.VectorService.InsertVector(req, indexNameParam)
+	vecId, err := h.VectorService.InsertVector(&req, indexNameParam)
 	if err != nil {
 		fmt.Println("Error inserting vector:", err)
 		http.Error(w, "Failed to insert vector", http.StatusInternalServerError)
@@ -41,7 +41,6 @@ func (h *Handler) InsertVectorHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(res)
-
 }
 
 func (h *Handler) DeleteVectorHandler(w http.ResponseWriter, r *http.Request) {
@@ -55,10 +54,14 @@ func (h *Handler) DeleteVectorHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.VectorService.DeleteVector(vectId, indexName)
+	err = h.VectorService.DeleteVector(vectId, indexName)
+	if err != nil {
+		http.Error(w, "Failed to delete vector", http.StatusInternalServerError)
+		return
+	}
 
 	res := dto.DeleteVectorResponse{
-		Status:  "200",
+		Status:  "success",
 		Message: "Vector deleted successfully",
 		Results: entity.DeleteVectorResult{
 			ID: vectId,
@@ -70,7 +73,6 @@ func (h *Handler) DeleteVectorHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) SearchVectorHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("--SEARCH HANDLER--")
 	vars := mux.Vars(r)
 	indexName := vars["indexName"]
 
@@ -81,7 +83,7 @@ func (h *Handler) SearchVectorHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	vectorChunks := strings.Split(vectorParam, ",")
-	var vec []*float32
+	var vec []float32
 
 	for _, p := range vectorChunks {
 		val, err := strconv.ParseFloat(strings.TrimSpace(p), 32)
@@ -90,26 +92,19 @@ func (h *Handler) SearchVectorHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		v := float32(val)
-		vec = append(vec, &v)
+		vec = append(vec, v)
 	}
 
 	fmt.Println("Vector to search:", vec)
 
-	kParam := r.URL.Query().Get("top_k")
-	var k int
-	var err error
-	if kParam != "" {
-		k, err = strconv.Atoi(kParam)
-		if err != nil {
-			http.Error(w, "Invalid k parameter", http.StatusBadRequest)
+	var k int = 5
+	if kParam := r.URL.Query().Get("top_k"); kParam != "" {
+		if parsedK, err := strconv.Atoi(kParam); err != nil || parsedK <= 0 {
+			http.Error(w, "Invalid 'top_k' parameter: must be greater than zero", http.StatusBadRequest)
 			return
+		} else {
+			k = parsedK
 		}
-		if k <= 0 {
-			http.Error(w, "k must be greater than 0", http.StatusBadRequest)
-			return
-		}
-	} else {
-		k = 5
 	}
 
 	fmt.Println("topK:", k)
