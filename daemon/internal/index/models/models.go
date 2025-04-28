@@ -1,6 +1,6 @@
 package models
 
-import "victord/daemon/platform/victor"
+import "victord/daemon/internal/nativeops"
 
 type IndexResource struct {
 	IndexID   string `json:"index_id"`
@@ -8,5 +8,5 @@ type IndexResource struct {
 	Method    int    `json:"method"`
 	Dims      uint16 `json:"dims"`
 	IndexName string `json:"index_name"`
-	VIndex    *victor.Index
+	VIndex    nativeops.VectorOps
 }

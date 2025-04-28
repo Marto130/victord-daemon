@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -10,14 +11,12 @@ import (
 )
 
 func main() {
-
 	flag.Parse()
 
-	router := *api.SetupRouter()
+	router := api.SetupRouter()
 
-	address := *config.Host + ":" + strconv.Itoa(*config.Port)
-	log.Printf("Victor daemon running on Host: %s Port: %s", *config.Host, strconv.Itoa(*config.Port))
-	if err := http.ListenAndServe(address, &router); err != nil {
-		log.Fatalf("Error starting Victor daemon: %v", err)
-	}
+	address := fmt.Sprintf("%s:%s", *config.Host, strconv.Itoa(*config.Port))
+
+	log.Printf("Victor daemon running on %s", address)
+	log.Fatal(http.ListenAndServe(address, router))
 }

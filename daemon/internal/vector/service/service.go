@@ -6,38 +6,34 @@ import (
 	"victord/daemon/internal/dto"
 	vectorEntity "victord/daemon/internal/entity/vector"
 	"victord/daemon/internal/store/service"
-	storeService "victord/daemon/internal/store/service"
 )
 
 type vectorService struct {
+	store service.IndexStore
 }
 
-func NewVectorService() VectorService {
-	return &vectorService{}
+func NewVectorService(store service.IndexStore) VectorService {
+	return &vectorService{
+		store: store,
+	}
 }
 
 func (v *vectorService) InsertVector(vectorData *dto.InsertVectorRequest, idxName string) (*uint64, error) {
 
-	indexResource, exists := storeService.GetIndex(idxName)
+	indexResource, exists := v.store.GetIndex(idxName)
 	if !exists {
 		return nil, errors.New("index not found")
 	}
 
-	vIndex := indexResource.VIndex
 	vector := vectorData.Vector
 	vectId := vectorData.ID
 
-	dims, dimsExists := storeService.GetIndexDims(idxName)
-	if !dimsExists {
-		return nil, errors.New("Index dimensions not found")
-	}
-
-	if len(vector) != int(dims) {
-		return nil, errors.New("Vector dimensions do not match index dimensions")
+	if len(vector) != int(indexResource.Dims) {
+		return nil, errors.New("vector dimensions do not match index dimensions")
 
 	}
 
-	if err := vIndex.Insert(vectId, vector); err != nil {
+	if err := indexResource.VIndex.Insert(vectId, vector); err != nil {
 		return nil, errors.New(err.Error())
 	}
 
@@ -45,44 +41,30 @@ func (v *vectorService) InsertVector(vectorData *dto.InsertVectorRequest, idxNam
 
 }
 
-func (v *vectorService) DeleteVector(vectorId uint64, idxName string) (*uint64, error) {
-	indexResource, exists := storeService.GetIndex(idxName)
+func (v *vectorService) DeleteVector(vectorId uint64, idxName string) error {
+	indexResource, exists := v.store.GetIndex(idxName)
 	if !exists {
-		return nil, errors.New("Index not found")
+		return errors.New("index not found")
 	}
 
-	vIndex := indexResource.VIndex
-
-	err := vIndex.Delete(vectorId)
+	err := indexResource.VIndex.Delete(vectorId)
 	if err != nil {
-		return nil, errors.New(err.Error())
+		return errors.New(err.Error())
 	}
 
-	return &vectorId, nil
+	return nil
 }
 
-func (v *vectorService) SearchVector(vector []*float32, idxName string, topK int) (*vectorEntity.SearchVectorResult, error) {
-	fmt.Println("Index name: ", idxName)
-
-	indexResource, exists := service.GetIndex(idxName)
+func (v *vectorService) SearchVector(vector []float32, idxName string, topK int) (*vectorEntity.SearchVectorResult, error) {
+	indexResource, exists := v.store.GetIndex(idxName)
 	if !exists {
-		return nil, errors.New("Index not found")
-	}
-
-	vIndex := indexResource.VIndex
-
-	flatVector := make([]float32, len(vector))
-	for i, f := range vector {
-		if f == nil {
-			return nil, errors.New("nil value in vector")
-		}
-		flatVector[i] = *f
+		return nil, errors.New("index not found")
 	}
 
 	fmt.Println("Vector to search: ", vector)
 	fmt.Println("topK: ", topK)
 
-	result, err := vIndex.Search(flatVector, topK)
+	result, err := indexResource.VIndex.Search(vector, topK)
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}

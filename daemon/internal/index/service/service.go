@@ -6,30 +6,33 @@ import (
 	"victord/daemon/internal/dto"
 	"victord/daemon/internal/entity/index"
 	"victord/daemon/internal/index/models"
+	"victord/daemon/internal/nativeops"
 	"victord/daemon/internal/store/service"
-	storeService "victord/daemon/internal/store/service"
-	"victord/daemon/platform/victor"
 
 	"github.com/google/uuid"
 )
 
 type indexService struct {
+	store    service.IndexStore
+	indexOps nativeops.IndexOps
 }
 
-func NewIndexService() IndexService {
-	return &indexService{}
+func NewIndexService(store service.IndexStore, indexOps nativeops.IndexOps) IndexService {
+	return &indexService{
+		store:    store,
+		indexOps: indexOps,
+	}
 }
 
 func (i *indexService) CreateIndex(ctx context.Context, idx *dto.CreateIndexRequest, name string) (*models.IndexResource, error) {
-
-	index, err := victor.AllocIndex(idx.IndexType, idx.Method, idx.Dims)
+	index, err := i.indexOps.AllocIndex(idx.IndexType, idx.Method, idx.Dims)
 	if err != nil {
 		return nil, err
 	}
 
 	indexID := uuid.New().String()
 
-	indexResource := models.IndexResource{
+	indexResource := &models.IndexResource{
 		IndexType: idx.IndexType,
 		Method:    idx.Method,
 		Dims:      idx.Dims,
@@ -38,14 +41,14 @@ func (i *indexService) CreateIndex(ctx context.Context, idx *dto.CreateIndexRequ
 		IndexID:   indexID,
 	}
 
-	service.StoreIndex(&indexResource)
+	i.store.StoreIndex(indexResource)
 
-	return &indexResource, err
+	return indexResource, err
 }
 
 func (i *indexService) DestroyIndex(ctx context.Context, name string) (*index.DestroyIndexResult, error) {
 
-	indexResource, exists := storeService.GetIndex(name)
+	indexResource, exists := i.store.GetIndex(name)
 	if !exists {
 		return nil, errors.New("Index not found")
 	}
