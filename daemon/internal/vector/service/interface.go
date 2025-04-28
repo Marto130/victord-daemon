@@ -6,7 +6,7 @@ import (
 )
 
 type VectorService interface {
-	InsertVector(vectorData *dto.InsertVectorRequest, idxName string) (*uint64, error)
-	DeleteVector(vectorId uint64, idxName string) (*uint64, error)
-	SearchVector(vector []*float32, idxName string, topK int) (*vectorEntity.SearchVectorResult, error)
+	InsertVector(*dto.InsertVectorRequest, string) (*uint64, error)
+	DeleteVector(uint64, string) error
+	SearchVector([]float32, string, int) (*vectorEntity.SearchVectorResult, error)
 }

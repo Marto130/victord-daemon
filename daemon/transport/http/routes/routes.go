@@ -1,7 +1,7 @@
 package routes
 
 const (
-	CreateIndexPath  = "/api/index/{indexName}"
+	IndexPath        = "/api/index/{indexName}"
 	DestroyIndexPath = "/api/index/{indexName}"
 	InsertVectorPath = "/api/vector/{indexName}"
 	DeleteVectorPath = "/api/vector/{indexName}/{vectorID}"

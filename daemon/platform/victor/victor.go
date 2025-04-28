@@ -10,6 +10,7 @@ import "C"
 import (
 	"fmt"
 	"unsafe"
+	"victord/daemon/platform/types"
 )
 
 // ErrorCode maps C error codes to Go
@@ -63,15 +64,9 @@ func toError(code C.int) error {
 		return nil
 	}
 	if msg, exists := errorMessages[ErrorCode(code)]; exists {
-		return fmt.Errorf(msg)
+		return fmt.Errorf("%s", msg)
 	}
 	return fmt.Errorf("unknown error code: %d", code)
-}
-
-// MatchResult represents a search result in Go
-type MatchResult struct {
-	ID       int     `json:"id"`
-	Distance float32 `json:"distance"`
 }
 
 // Index represents an index structure in Go
@@ -102,7 +97,7 @@ func (idx *Index) Insert(id uint64, vector []float32) error {
 }
 
 // Search finds the closest match for a given vector
-func (idx *Index) Search(vector []float32, dims int) (*MatchResult, error) {
+func (idx *Index) Search(vector []float32, dims int) (*types.MatchResult, error) {
 	if idx.ptr == nil {
 		return nil, ErrIndexNotInitialized
 	}
@@ -118,14 +113,14 @@ func (idx *Index) Search(vector []float32, dims int) (*MatchResult, error) {
 		return nil, e
 	}
 
-	return &MatchResult{
+	return &types.MatchResult{
 		ID:       int(cResult.id),
 		Distance: float32(cResult.distance),
 	}, nil
 }
 
 // SearchN finds the n closest matches for a given vector
-func (idx *Index) SearchN(vector []float32, n int) ([]MatchResult, error) {
+func (idx *Index) SearchN(vector []float32, n int) ([]types.MatchResult, error) {
 	if idx.ptr == nil {
 		return nil, ErrIndexNotInitialized
 	}
@@ -147,9 +142,9 @@ func (idx *Index) SearchN(vector []float32, n int) ([]MatchResult, error) {
 	}
 
 	// Convert C results to Go results
-	results := make([]MatchResult, n)
+	results := make([]types.MatchResult, n)
 	for i := 0; i < n; i++ {
-		results[i] = MatchResult{
+		results[i] = types.MatchResult{
 			ID:       int(cResults[i].id),
 			Distance: float32(cResults[i].distance),
 		}

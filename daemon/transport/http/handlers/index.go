@@ -10,16 +10,10 @@ import (
 )
 
 func (h *Handler) CreateIndexHandler(w http.ResponseWriter, r *http.Request) {
-
-	var createIndexRequest dto.CreateIndexRequest
-
 	urlParams := mux.Vars(r)
 	indexNameParam := urlParams["indexName"]
-	if indexNameParam == "" {
-		http.Error(w, "Index name is required", http.StatusBadRequest)
-		return
-	}
 
+	var createIndexRequest dto.CreateIndexRequest
 	if err := json.NewDecoder(r.Body).Decode(&createIndexRequest); err != nil {
 		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
@@ -28,12 +22,10 @@ func (h *Handler) CreateIndexHandler(w http.ResponseWriter, r *http.Request) {
 	indexResource, err := h.IndexService.CreateIndex(r.Context(), &createIndexRequest, indexNameParam)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-
+		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-
-	res := dto.CreateIndexResponse{
+	res := &dto.CreateIndexResponse{
 		Status:  "Success",
 		Message: "Index created successfully",
 		Results: indexEntity.CreateIndexResult{
@@ -44,7 +36,8 @@ func (h *Handler) CreateIndexHandler(w http.ResponseWriter, r *http.Request) {
 			Method:    indexResource.Method,
 		},
 	}
-	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(res)
 }
 
@@ -52,18 +45,12 @@ func (h *Handler) DestroyIndexHandler(w http.ResponseWriter, r *http.Request) {
 
 	urlParams := mux.Vars(r)
 	indexNameParam := urlParams["indexName"]
-	if indexNameParam == "" {
-		http.Error(w, "Index name is required", http.StatusBadRequest)
-		return
-	}
 
 	destroyResult, err := h.IndexService.DestroyIndex(r.Context(), indexNameParam)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-
+		return
 	}
-
-	w.Header().Set("Content-Type", "application/json")
 
 	res := dto.DestroyIndexResponse{
 		Status:  "Success",
@@ -73,6 +60,7 @@ func (h *Handler) DestroyIndexHandler(w http.ResponseWriter, r *http.Request) {
 			IndexName: destroyResult.IndexName,
 		},
 	}
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(res)
 }
