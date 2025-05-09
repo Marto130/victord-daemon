@@ -1,20 +1,27 @@
 package wrapper
 
 import (
-	"victord/daemon/internal/nativeops"
 	"victord/daemon/platform/victor"
 )
 
-type index struct{}
-
-func NewIndex() nativeops.IndexOps {
-	return &index{}
+type VIndex struct {
+	Index *victor.Index
 }
 
-func (i *index) AllocIndex(indexType, method int, dims uint16) (nativeops.VectorOps, error) {
+func NewIndex() *VIndex {
+	return &VIndex{}
+}
+
+func (i *VIndex) AllocIndex(indexType, method int, dims uint16) (*VIndex, error) {
 	idx, err := victor.AllocIndex(indexType, method, dims)
 	if err != nil {
 		return nil, err
 	}
-	return &cindex{Index: idx}, nil
+	return &VIndex{Index: idx}, nil
+}
+
+func (i *VIndex) DestroyIndex() {
+	if i.Index != nil {
+		i.Index.DestroyIndex()
+	}
 }

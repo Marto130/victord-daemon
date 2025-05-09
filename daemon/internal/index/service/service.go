@@ -25,7 +25,8 @@ func NewIndexService(store service.IndexStore, indexOps nativeops.IndexOps) Inde
 }
 
 func (i *indexService) CreateIndex(ctx context.Context, idx *dto.CreateIndexRequest, name string) (*models.IndexResource, error) {
-	index, err := i.indexOps.AllocIndex(idx.IndexType, idx.Method, idx.Dims)
+
+	vindex, err := i.indexOps.AllocIndex(idx.IndexType, idx.Method, idx.Dims)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +37,7 @@ func (i *indexService) CreateIndex(ctx context.Context, idx *dto.CreateIndexRequ
 		IndexType: idx.IndexType,
 		Method:    idx.Method,
 		Dims:      idx.Dims,
-		VIndex:    index,
+		VIndex:    vindex,
 		IndexName: name,
 		IndexID:   indexID,
 	}

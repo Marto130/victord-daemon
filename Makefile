@@ -14,3 +14,5 @@ generate-mocks:
 	mockgen --source=./daemon/internal/index/service/interface.go --destination=./daemon/internal/mocks/index_mock.go --package=mocks
 	
 
+run-http:
+		go run ./daemon/cmd/http/main.go
