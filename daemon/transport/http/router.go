@@ -3,8 +3,8 @@ package api
 import (
 	"net/http"
 
+	"victord/daemon/internal/index/factory"
 	iService "victord/daemon/internal/index/service"
-	c "victord/daemon/internal/nativeops/cimpl"
 	"victord/daemon/internal/store/service"
 	vService "victord/daemon/internal/vector/service"
 	"victord/daemon/transport/http/handlers"
@@ -24,9 +24,9 @@ func RegisterRoutes(r *mux.Router, h *handlers.Handler) {
 func SetupRouter() *mux.Router {
 	router := mux.NewRouter()
 	indexStore := service.NewIndexStore()
-	indexOps := c.NewIndex()
+	indexFactory := factory.NewIndexFactory()
 	handler := &handlers.Handler{
-		IndexService:  iService.NewIndexService(indexStore, indexOps),
+		IndexService:  iService.NewIndexService(indexStore, indexFactory),
 		VectorService: vService.NewVectorService(indexStore),
 	}
 	RegisterRoutes(router, handler)

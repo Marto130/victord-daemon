@@ -1,6 +1,7 @@
-package wrapper
+package cimpl
 
 import (
+	"victord/daemon/internal/index/factory"
 	"victord/daemon/platform/victor"
 )
 
@@ -12,8 +13,9 @@ func NewIndex() *VIndex {
 	return &VIndex{}
 }
 
-func (i *VIndex) AllocIndex(indexType, method int, dims uint16) (*VIndex, error) {
-	idx, err := victor.AllocIndex(indexType, method, dims)
+func AllocIndex(indexOption factory.GenericIndex) (*VIndex, error) { //laura
+	idx, err := victor.AllocIndex(int(indexOption.IndexType()), int(indexOption.Method()),
+		indexOption.Dimension(), indexOption.Parameters())
 	if err != nil {
 		return nil, err
 	}

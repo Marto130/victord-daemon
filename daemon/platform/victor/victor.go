@@ -75,7 +75,7 @@ type Index struct {
 }
 
 // AllocIndex creates a new index
-func AllocIndex(indexType, method int, dims uint16) (*Index, error) {
+func AllocIndex(indexType, method int, dims uint16, iContext map[string]int) (*Index, error) { //TODO: temporary type, in victorgo is an interface
 	idx := C.alloc_index(C.int(indexType), C.int(method), C.uint16_t(dims), nil)
 	if idx == nil {
 		return nil, fmt.Errorf("failed to allocate index")

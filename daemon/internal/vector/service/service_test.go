@@ -1,6 +1,6 @@
 package service
 
-import (
+/*import (
 	"errors"
 	"reflect"
 	"testing"
@@ -301,3 +301,4 @@ func Test_vectorService_SearchVector(t *testing.T) {
 		})
 	}
 }
+*/

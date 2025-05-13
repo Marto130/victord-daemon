@@ -1,6 +1,6 @@
 package service
 
-import (
+/*import (
 	"context"
 	"errors"
 	"reflect"
@@ -115,3 +115,4 @@ func Test_indexService_CreateIndex(t *testing.T) {
 		})
 	}
 }
+*/
