@@ -43,7 +43,7 @@ func Test_indexService_CreateIndex(t *testing.T) {
 			},
 			setupMocks: func(m *mocksIndex) {
 				m.indexFactory.EXPECT().
-					CreateIndexType(gm.Any()).
+					CreateIndex(gm.Any()).
 					Return(nil, errors.New("error"))
 
 			},
@@ -65,7 +65,7 @@ func Test_indexService_CreateIndex(t *testing.T) {
 			},
 			setupMocks: func(m *mocksIndex) {
 				m.indexFactory.EXPECT().
-					CreateIndexType(gm.Any()).
+					CreateIndex(gm.Any()).
 					Return(m.genericIndex, nil)
 				m.store.EXPECT().StoreIndex(gm.Any())
 				m.cIndexOps.EXPECT().

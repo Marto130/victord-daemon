@@ -26,7 +26,7 @@ func SetupRouter() *mux.Router {
 	router := mux.NewRouter()
 	indexStore := service.NewIndexStore()
 	indexFactory := factory.NewIndexFactory()
-	indexOps := cimpl.NewIndexOps()
+	indexOps := cimpl.NewIndexConstructor()
 
 	handler := &handlers.Handler{
 		IndexService:  iService.NewIndexService(indexStore, indexFactory, indexOps),

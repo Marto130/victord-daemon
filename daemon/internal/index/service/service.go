@@ -28,7 +28,7 @@ func NewIndexService(store service.IndexStore, index factory.IndexFactory, index
 }
 
 func (i *indexService) CreateIndex(ctx context.Context, idx *dto.CreateIndexRequest, name string) (*models.IndexResource, error) {
-	genericIndex, err := i.index.CreateIndexType(idx)
+	genericIndex, err := i.index.CreateIndex(idx)
 	if err != nil {
 		return nil, err
 	}

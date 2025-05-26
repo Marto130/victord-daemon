@@ -6,7 +6,7 @@ import (
 )
 
 type IndexFactory interface {
-	CreateIndexType(*dto.CreateIndexRequest) (GenericIndex, error)
+	CreateIndex(*dto.CreateIndexRequest) (GenericIndex, error)
 }
 
 type defaultFactory struct{}
@@ -15,7 +15,7 @@ func NewIndexFactory() IndexFactory {
 	return &defaultFactory{}
 }
 
-func (d *defaultFactory) CreateIndexType(request *dto.CreateIndexRequest) (GenericIndex, error) {
+func (d *defaultFactory) CreateIndex(request *dto.CreateIndexRequest) (GenericIndex, error) {
 	iType := IndexType(request.IndexType)
 	switch iType {
 	case FlatIndexType:

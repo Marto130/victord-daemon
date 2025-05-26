@@ -6,31 +6,31 @@ import (
 	"victord/daemon/platform/victor"
 )
 
-type IndexOpsImpl struct{}
+type IndexConstructor struct{}
 
-type VIndex struct {
-	Index *victor.Index
+type NativeIndex struct {
+	CIndex *victor.Index
 }
 
-func NewIndex() *VIndex {
-	return &VIndex{}
+func NewIndex() *NativeIndex {
+	return &NativeIndex{}
 }
 
-func (io *IndexOpsImpl) AllocIndex(indexOption factory.GenericIndex) (nativeops.VectorOps, error) { //laura
+func (io *IndexConstructor) AllocIndex(indexOption factory.GenericIndex) (nativeops.VectorOps, error) { //laura
 	idx, err := victor.AllocIndex(int(indexOption.IndexType()), int(indexOption.Method()),
 		indexOption.Dimension(), indexOption.Parameters())
 	if err != nil {
 		return nil, err
 	}
-	return &VIndex{Index: idx}, nil
+	return &NativeIndex{CIndex: idx}, nil
 }
 
-func (i *VIndex) DestroyIndex() {
-	if i.Index != nil {
-		i.Index.DestroyIndex()
+func (i *NativeIndex) DestroyIndex() {
+	if i.CIndex != nil {
+		i.CIndex.DestroyIndex()
 	}
 }
 
-func NewIndexOps() nativeops.IndexOps {
-	return &IndexOpsImpl{}
+func NewIndexConstructor() nativeops.IndexOps {
+	return &IndexConstructor{}
 }

@@ -35,17 +35,17 @@ func (m *MockIndexFactory) EXPECT() *MockIndexFactoryMockRecorder {
 	return m.recorder
 }
 
-// CreateIndexType mocks base method.
-func (m *MockIndexFactory) CreateIndexType(arg0 *dto.CreateIndexRequest) (factory.GenericIndex, error) {
+// CreateIndex mocks base method.
+func (m *MockIndexFactory) CreateIndex(arg0 *dto.CreateIndexRequest) (factory.GenericIndex, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateIndexType", arg0)
+	ret := m.ctrl.Call(m, "CreateIndex", arg0)
 	ret0, _ := ret[0].(factory.GenericIndex)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// CreateIndexType indicates an expected call of CreateIndexType.
-func (mr *MockIndexFactoryMockRecorder) CreateIndexType(arg0 interface{}) *gomock.Call {
+// CreateIndex indicates an expected call of CreateIndex.
+func (mr *MockIndexFactoryMockRecorder) CreateIndex(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateIndexType", reflect.TypeOf((*MockIndexFactory)(nil).CreateIndexType), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateIndex", reflect.TypeOf((*MockIndexFactory)(nil).CreateIndex), arg0)
 }
