@@ -1,6 +1,7 @@
 package nativeops
 
 import (
+	"victord/daemon/internal/index/factory"
 	"victord/daemon/platform/types"
 )
 
@@ -13,4 +14,8 @@ type VectorOps interface {
 	Insert(uint64, []float32) error
 	Search([]float32, int) (*types.MatchResult, error)
 	DestroyIndex()
+}
+
+type IndexOps interface {
+	AllocIndex(factory.GenericIndex) (VectorOps, error)
 }

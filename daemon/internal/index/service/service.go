@@ -7,21 +7,23 @@ import (
 	"victord/daemon/internal/entity/index"
 	"victord/daemon/internal/index/factory"
 	"victord/daemon/internal/index/models"
-	"victord/daemon/internal/nativeops/cimpl"
+	"victord/daemon/internal/nativeops"
 	"victord/daemon/internal/store/service"
 
 	"github.com/google/uuid"
 )
 
 type indexService struct {
-	store service.IndexStore
-	index factory.IndexFactory
+	store    service.IndexStore
+	index    factory.IndexFactory
+	indexOps nativeops.IndexOps
 }
 
-func NewIndexService(store service.IndexStore, index factory.IndexFactory) IndexService {
+func NewIndexService(store service.IndexStore, index factory.IndexFactory, indexOps nativeops.IndexOps) IndexService {
 	return &indexService{
-		store: store,
-		index: index,
+		store:    store,
+		index:    index,
+		indexOps: indexOps,
 	}
 }
 
@@ -31,7 +33,7 @@ func (i *indexService) CreateIndex(ctx context.Context, idx *dto.CreateIndexRequ
 		return nil, err
 	}
 
-	vindex, err := cimpl.AllocIndex(genericIndex)
+	vindex, err := i.indexOps.AllocIndex(genericIndex)
 	if err != nil {
 		return nil, err
 	}

@@ -5,6 +5,7 @@ import (
 
 	"victord/daemon/internal/index/factory"
 	iService "victord/daemon/internal/index/service"
+	"victord/daemon/internal/nativeops/cimpl"
 	"victord/daemon/internal/store/service"
 	vService "victord/daemon/internal/vector/service"
 	"victord/daemon/transport/http/handlers"
@@ -25,8 +26,10 @@ func SetupRouter() *mux.Router {
 	router := mux.NewRouter()
 	indexStore := service.NewIndexStore()
 	indexFactory := factory.NewIndexFactory()
+	indexOps := cimpl.NewIndexOps()
+
 	handler := &handlers.Handler{
-		IndexService:  iService.NewIndexService(indexStore, indexFactory),
+		IndexService:  iService.NewIndexService(indexStore, indexFactory, indexOps),
 		VectorService: vService.NewVectorService(indexStore),
 	}
 	RegisterRoutes(router, handler)
