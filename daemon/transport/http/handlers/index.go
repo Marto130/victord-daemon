@@ -32,8 +32,8 @@ func (h *Handler) CreateIndexHandler(w http.ResponseWriter, r *http.Request) {
 			IndexName: indexResource.IndexName,
 			ID:        indexResource.IndexID,
 			Dims:      indexResource.Dims,
-			IndexType: indexResource.IndexType,
-			Method:    indexResource.Method,
+			IndexType: int(indexResource.IndexType),
+			Method:    int(indexResource.Method),
 		},
 	}
 	w.Header().Set("Content-Type", "application/json")

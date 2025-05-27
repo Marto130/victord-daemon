@@ -5,9 +5,10 @@ import (
 )
 
 type CreateIndexRequest struct {
-	IndexType int    `json:"index_type"`
-	Method    int    `json:"method"`
-	Dims      uint16 `json:"dims"`
+	IndexType int            `json:"index_type"`
+	Method    int            `json:"method"`
+	Dims      uint16         `json:"dims"`
+	Options   map[string]int `json:"options"` //TODO: generic type
 }
 
 type CreateIndexResponse struct {

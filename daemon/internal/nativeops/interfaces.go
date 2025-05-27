@@ -1,12 +1,9 @@
 package nativeops
 
 import (
+	"victord/daemon/internal/index/factory"
 	"victord/daemon/platform/types"
 )
-
-type IndexOps interface {
-	AllocIndex(int, int, uint16) (VectorOps, error)
-}
 
 // VectorOps defines the interface for managing vector data within an index.
 //
@@ -16,5 +13,9 @@ type VectorOps interface {
 	Delete(uint64) error
 	Insert(uint64, []float32) error
 	Search([]float32, int) (*types.MatchResult, error)
-	DestroyIndex() //TODO: remove from vector operations
+	DestroyIndex()
+}
+
+type IndexOps interface {
+	AllocIndex(factory.GenericIndex) (VectorOps, error)
 }

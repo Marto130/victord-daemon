@@ -15,9 +15,11 @@ import (
 
 func Test_indexService_CreateIndex(t *testing.T) {
 	type mocksIndex struct {
-		store       *mocks.MockIndexStore
-		indexOps    *mocks.MockIndexOps
-		vectorIndex *mocks.MockVectorOps
+		store        *mocks.MockIndexStore
+		vectorIndex  *mocks.MockVectorOps
+		indexFactory *mocks.MockIndexFactory
+		genericIndex *mocks.MockGenericIndex
+		cIndexOps    *mocks.MockIndexOps
 	}
 
 	type args struct {
@@ -40,7 +42,8 @@ func Test_indexService_CreateIndex(t *testing.T) {
 				idx:  &dto.CreateIndexRequest{},
 			},
 			setupMocks: func(m *mocksIndex) {
-				m.indexOps.EXPECT().AllocIndex(gm.Any(), gm.Any(), gm.Any()).
+				m.indexFactory.EXPECT().
+					CreateIndex(gm.Any()).
 					Return(nil, errors.New("error"))
 
 			},
@@ -61,9 +64,14 @@ func Test_indexService_CreateIndex(t *testing.T) {
 				},
 			},
 			setupMocks: func(m *mocksIndex) {
-				m.indexOps.EXPECT().AllocIndex(gm.Any(), gm.Any(), gm.Any()).
-					Return(m.vectorIndex, nil)
+				m.indexFactory.EXPECT().
+					CreateIndex(gm.Any()).
+					Return(m.genericIndex, nil)
 				m.store.EXPECT().StoreIndex(gm.Any())
+				m.cIndexOps.EXPECT().
+					AllocIndex(gm.Any()).
+					Return(m.vectorIndex, nil)
+
 			},
 			want: func(mi *mocksIndex) *models.IndexResource {
 				return &models.IndexResource{
@@ -84,21 +92,26 @@ func Test_indexService_CreateIndex(t *testing.T) {
 			defer ctrl.Finish()
 
 			storeMock := mocks.NewMockIndexStore(ctrl)
-			indexMock := mocks.NewMockIndexOps(ctrl)
+			indexFactory := mocks.NewMockIndexFactory(ctrl)
 			vectorIndexMock := mocks.NewMockVectorOps(ctrl)
+			genericIndexMock := mocks.NewMockGenericIndex(ctrl)
+			nativeIndexOpsMock := mocks.NewMockIndexOps(ctrl)
 
 			mocks := &mocksIndex{
-				store:       storeMock,
-				indexOps:    indexMock,
-				vectorIndex: vectorIndexMock,
+				store:        storeMock,
+				vectorIndex:  vectorIndexMock,
+				indexFactory: indexFactory,
+				genericIndex: genericIndexMock,
+				cIndexOps:    nativeIndexOpsMock,
 			}
 
 			if tt.setupMocks != nil {
 				tt.setupMocks(mocks)
 			}
 
-			i := NewIndexService(storeMock, indexMock)
-			got, err := i.CreateIndex(tt.args.ctx, tt.args.idx, tt.args.name)
+			svc := NewIndexService(storeMock, indexFactory, nativeIndexOpsMock)
+
+			got, err := svc.CreateIndex(tt.args.ctx, tt.args.idx, tt.args.name)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("indexService.CreateIndex() error = %v, wantErr %v", err, tt.wantErr)
 				return

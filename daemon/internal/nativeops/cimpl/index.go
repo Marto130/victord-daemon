@@ -1,20 +1,36 @@
-package wrapper
+package cimpl
 
 import (
+	"victord/daemon/internal/index/factory"
 	"victord/daemon/internal/nativeops"
 	"victord/daemon/platform/victor"
 )
 
-type index struct{}
+type IndexConstructor struct{}
 
-func NewIndex() nativeops.IndexOps {
-	return &index{}
+type NativeIndex struct {
+	CIndex *victor.Index
 }
 
-func (i *index) AllocIndex(indexType, method int, dims uint16) (nativeops.VectorOps, error) {
-	idx, err := victor.AllocIndex(indexType, method, dims)
+func NewIndex() *NativeIndex {
+	return &NativeIndex{}
+}
+
+func (io *IndexConstructor) AllocIndex(indexOption factory.GenericIndex) (nativeops.VectorOps, error) { //laura
+	idx, err := victor.AllocIndex(int(indexOption.IndexType()), int(indexOption.Method()),
+		indexOption.Dimension(), indexOption.Parameters())
 	if err != nil {
 		return nil, err
 	}
-	return &cindex{Index: idx}, nil
+	return &NativeIndex{CIndex: idx}, nil
+}
+
+func (i *NativeIndex) DestroyIndex() {
+	if i.CIndex != nil {
+		i.CIndex.DestroyIndex()
+	}
+}
+
+func NewIndexConstructor() nativeops.IndexOps {
+	return &IndexConstructor{}
 }

@@ -6,49 +6,12 @@ package mocks
 
 import (
 	reflect "reflect"
+	factory "victord/daemon/internal/index/factory"
 	nativeops "victord/daemon/internal/nativeops"
 	types "victord/daemon/platform/types"
 
 	gomock "github.com/golang/mock/gomock"
 )
-
-// MockIndexOps is a mock of IndexOps interface.
-type MockIndexOps struct {
-	ctrl     *gomock.Controller
-	recorder *MockIndexOpsMockRecorder
-}
-
-// MockIndexOpsMockRecorder is the mock recorder for MockIndexOps.
-type MockIndexOpsMockRecorder struct {
-	mock *MockIndexOps
-}
-
-// NewMockIndexOps creates a new mock instance.
-func NewMockIndexOps(ctrl *gomock.Controller) *MockIndexOps {
-	mock := &MockIndexOps{ctrl: ctrl}
-	mock.recorder = &MockIndexOpsMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockIndexOps) EXPECT() *MockIndexOpsMockRecorder {
-	return m.recorder
-}
-
-// AllocIndex mocks base method.
-func (m *MockIndexOps) AllocIndex(arg0, arg1 int, arg2 uint16) (nativeops.VectorOps, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AllocIndex", arg0, arg1, arg2)
-	ret0, _ := ret[0].(nativeops.VectorOps)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// AllocIndex indicates an expected call of AllocIndex.
-func (mr *MockIndexOpsMockRecorder) AllocIndex(arg0, arg1, arg2 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AllocIndex", reflect.TypeOf((*MockIndexOps)(nil).AllocIndex), arg0, arg1, arg2)
-}
 
 // MockVectorOps is a mock of VectorOps interface.
 type MockVectorOps struct {
@@ -126,4 +89,42 @@ func (m *MockVectorOps) Search(arg0 []float32, arg1 int) (*types.MatchResult, er
 func (mr *MockVectorOpsMockRecorder) Search(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Search", reflect.TypeOf((*MockVectorOps)(nil).Search), arg0, arg1)
+}
+
+// MockIndexOps is a mock of IndexOps interface.
+type MockIndexOps struct {
+	ctrl     *gomock.Controller
+	recorder *MockIndexOpsMockRecorder
+}
+
+// MockIndexOpsMockRecorder is the mock recorder for MockIndexOps.
+type MockIndexOpsMockRecorder struct {
+	mock *MockIndexOps
+}
+
+// NewMockIndexOps creates a new mock instance.
+func NewMockIndexOps(ctrl *gomock.Controller) *MockIndexOps {
+	mock := &MockIndexOps{ctrl: ctrl}
+	mock.recorder = &MockIndexOpsMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockIndexOps) EXPECT() *MockIndexOpsMockRecorder {
+	return m.recorder
+}
+
+// AllocIndex mocks base method.
+func (m *MockIndexOps) AllocIndex(arg0 factory.GenericIndex) (nativeops.VectorOps, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AllocIndex", arg0)
+	ret0, _ := ret[0].(nativeops.VectorOps)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AllocIndex indicates an expected call of AllocIndex.
+func (mr *MockIndexOpsMockRecorder) AllocIndex(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AllocIndex", reflect.TypeOf((*MockIndexOps)(nil).AllocIndex), arg0)
 }

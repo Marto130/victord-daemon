@@ -5,6 +5,7 @@ import (
 	"errors"
 	"victord/daemon/internal/dto"
 	"victord/daemon/internal/entity/index"
+	"victord/daemon/internal/index/factory"
 	"victord/daemon/internal/index/models"
 	"victord/daemon/internal/nativeops"
 	"victord/daemon/internal/store/service"
@@ -14,18 +15,25 @@ import (
 
 type indexService struct {
 	store    service.IndexStore
+	index    factory.IndexFactory
 	indexOps nativeops.IndexOps
 }
 
-func NewIndexService(store service.IndexStore, indexOps nativeops.IndexOps) IndexService {
+func NewIndexService(store service.IndexStore, index factory.IndexFactory, indexOps nativeops.IndexOps) IndexService {
 	return &indexService{
 		store:    store,
+		index:    index,
 		indexOps: indexOps,
 	}
 }
 
 func (i *indexService) CreateIndex(ctx context.Context, idx *dto.CreateIndexRequest, name string) (*models.IndexResource, error) {
-	index, err := i.indexOps.AllocIndex(idx.IndexType, idx.Method, idx.Dims)
+	genericIndex, err := i.index.CreateIndex(idx)
+	if err != nil {
+		return nil, err
+	}
+
+	vindex, err := i.indexOps.AllocIndex(genericIndex)
 	if err != nil {
 		return nil, err
 	}
@@ -33,10 +41,10 @@ func (i *indexService) CreateIndex(ctx context.Context, idx *dto.CreateIndexRequ
 	indexID := uuid.New().String()
 
 	indexResource := &models.IndexResource{
-		IndexType: idx.IndexType,
-		Method:    idx.Method,
+		IndexType: factory.IndexType(idx.IndexType),
+		Method:    factory.MethodType(idx.Method),
 		Dims:      idx.Dims,
-		VIndex:    index,
+		VIndex:    vindex,
 		IndexName: name,
 		IndexID:   indexID,
 	}
